@@ -2,3 +2,13 @@
 **/Migrations/
 **/Migrations/*.cs
 **/Migrations/*.resx
+
+# Ignore les fichier binaires 
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+*.log
+*.cache
+*.db
