@@ -8,13 +8,15 @@ namespace jwt.Controllers
     [ApiController]
     public class HomeController : Controller
     {
-        
+    
         [HttpGet]
         [Authorize]
         public ActionResult Index()
         {
             return Ok( new string("Welcome to Jwt, its working ! "));
         }
+
+
 
     }
 }

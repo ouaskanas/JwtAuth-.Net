@@ -1,7 +1,6 @@
 ﻿using jwt.Models;
 using jwt.Services;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 
 namespace jwt.Controllers
@@ -54,12 +53,23 @@ namespace jwt.Controllers
             {
                 return Unauthorized(new { message = "Invalid credentials" });
             }
-            var result = await signInManager.CheckPasswordSignInAsync(user, loginModel.password, false);
+            if(await userManager.IsLockedOutAsync(user))
+            {
+                return Unauthorized(new { message = "User is locked out" });
+            }
+            var result = await signInManager.CheckPasswordSignInAsync(user, loginModel.password, lockoutOnFailure :true);
             if (!result.Succeeded)
             {
-                return Unauthorized(new { message = "Invalid credentials" });
+                var count = 5 - await userManager.GetAccessFailedCountAsync(user);
+                return Unauthorized(new { message = $"Invalid credentials , {count} times remains before the lock out !" });
             }
-            var token = await jwtService.GenerateToken(user);
+            
+                var token = await jwtService.GenerateToken(user);
+
+            //cookies option 
+            //var cookies = new CookieOptions { HttpOnly = true, Secure = true,SameSite = SameSiteMode.Strict, Expires = DateTime.Now.AddDays(7) };
+            //Response.Cookies.Append("jwt",token, cookies);
+
             return Ok(new
             {
                 token = token,

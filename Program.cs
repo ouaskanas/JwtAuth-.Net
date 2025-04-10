@@ -23,7 +23,8 @@ builder.Services.AddIdentity<User, IdentityRole>(option => {
     option.Password.RequiredLength = 8;
     option.Lockout.MaxFailedAccessAttempts = 5;
     option.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(10);
-    
+    option.Lockout.AllowedForNewUsers = true;
+
 }).AddEntityFrameworkStores<ApplicationDbContext>()
   .AddDefaultTokenProviders();
 
@@ -50,14 +51,22 @@ builder.Services.AddAuthentication(option =>
 });
 
 builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<SignInManager<User>>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllOrigins",
+        builder => builder.AllowAnyOrigin()
+                          .AllowAnyMethod()
+                          .AllowAnyHeader());
+});
 var app = builder.Build();
 
 
 
 // Configure the HTTP request pipeline.
-
+app.UseCors("AllowAllOrigins");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
