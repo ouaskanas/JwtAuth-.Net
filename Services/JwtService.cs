@@ -30,7 +30,7 @@ namespace jwt.Services
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtConfig:SecretKey"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
+            // audience should be imported from request header
             var token = new JwtSecurityToken(
                 issuer : _configuration["JwtConfig:Issuer"],
                 audience : _configuration["JwtConfig:Audience"],
@@ -40,7 +40,5 @@ namespace jwt.Services
                 );
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-
-
      }
 }

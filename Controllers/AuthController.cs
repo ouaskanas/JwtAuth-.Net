@@ -48,15 +48,18 @@ namespace jwt.Controllers
             {
                 return BadRequest(ModelState);
             }
+
             var user = await userManager.FindByEmailAsync(loginModel.email);
             if (user == null)
             {
                 return Unauthorized(new { message = "Invalid credentials" });
             }
+
             if(await userManager.IsLockedOutAsync(user))
             {
                 return Unauthorized(new { message = "User is locked out" });
             }
+            // formating code : pascal, kebab, kamel
             var result = await signInManager.CheckPasswordSignInAsync(user, loginModel.password, lockoutOnFailure :true);
             if (!result.Succeeded)
             {
@@ -67,19 +70,10 @@ namespace jwt.Controllers
                 var token = await jwtService.GenerateToken(user);
 
             //cookies option 
-            //var cookies = new CookieOptions { HttpOnly = true, Secure = true,SameSite = SameSiteMode.Strict, Expires = DateTime.Now.AddDays(7) };
-            //Response.Cookies.Append("jwt",token, cookies);
+            var cookies = new CookieOptions { HttpOnly = true, Secure = true, SameSite = SameSiteMode.Strict, Expires = DateTime.Now.AddDays(7) };
+            Response.Cookies.Append("jwt", token, cookies);
 
-            return Ok(new
-            {
-                token = token,
-                user = new
-                {
-                    id = user.Id,
-                    Email = user.Email,
-                    name = user.name
-                }
-            });
+            return Ok("LOGGED IN");
         }
 
     }

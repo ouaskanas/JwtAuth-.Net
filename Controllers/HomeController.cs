@@ -16,7 +16,5 @@ namespace jwt.Controllers
             return Ok( new string("Welcome to Jwt, its working ! "));
         }
 
-
-
     }
 }

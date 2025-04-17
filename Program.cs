@@ -47,7 +47,16 @@ builder.Services.AddAuthentication(option =>
         ValidIssuer = builder.Configuration["JwtConfig:Issuer"],
         ValidAudience = builder.Configuration["JwtConfig:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtConfig:SecretKey"]))
-     };
+    };
+    option.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            string cookieName = "jwt";
+            context.Token = context.Request.Cookies[cookieName];
+            return Task.CompletedTask;
+        }
+    };
 });
 
 builder.Services.AddScoped<IJwtService, JwtService>();
